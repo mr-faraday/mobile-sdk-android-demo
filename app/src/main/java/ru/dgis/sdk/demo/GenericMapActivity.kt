@@ -1,7 +1,10 @@
 package ru.dgis.sdk.demo
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -14,6 +17,9 @@ import ru.dgis.sdk.map.Map
 import ru.dgis.sdk.map.MapView
 import ru.dgis.sdk.map.MyLocationControllerSettings
 import ru.dgis.sdk.map.MyLocationMapObjectSource
+import ru.dgis.sdk.map.SnapToMapLayout
+import ru.dgis.sdk.geometry.GeoPointWithElevation
+import ru.dgis.sdk.map.Anchor
 
 class GenericMapActivity : AppCompatActivity() {
     private val sdkContext: Context by lazy { application.sdkContext }
@@ -73,6 +79,34 @@ class GenericMapActivity : AppCompatActivity() {
                 mapView.updateMapCopyrightPosition(root, settingsDrawerInnerLayout)
             }
         )
+
+        val snapToMapLayout = SnapToMapLayout(this)
+        val view = View(this)
+
+        view.layoutParams = ViewGroup.LayoutParams(400, 400)
+        view.setBackgroundColor(Color.parseColor("#ff0000"))
+
+        val wrapper = LinearLayout(this)
+        wrapper.addView(view)
+
+        val params = SnapToMapLayout.LayoutParams(
+            // Ширина, используем WRAP_CONTENT
+            width = ViewGroup.LayoutParams.WRAP_CONTENT,
+            // Высота, используем WRAP_CONTENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT,
+            // Точка на карте, к которой осуществляется привязка
+//            position = GeoPointWithElevation(point.lat, point.lon),
+            position = GeoPointWithElevation(55.767701, 37.729146),
+            // Точка на view, к которой осуществляется привязка
+            // В данном случае – левый верхний угол View
+            anchor = Anchor(0.0f, 0.0f),
+            // Смещение по оси X или Y относительно верхней и левой границы соответственно
+            offsetX = -15 * this.resources.displayMetrics.density,
+            offsetY = -15 * this.resources.displayMetrics.density
+        )
+
+        snapToMapLayout.addView(wrapper, params)
+        mapView.addView(snapToMapLayout)
     }
 
     private fun subscribeGestureSwitches(gm: GestureManager) {
