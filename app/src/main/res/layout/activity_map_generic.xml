@@ -1,155 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GenericMapActivity"
-    >
+    tools:context=".GenericMapActivity">
 
     <ru.dgis.sdk.map.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        >
+        app:dgis_cameraTargetLat="55.7532"
+        app:dgis_cameraTargetLng="37.6224"
+        app:dgis_cameraZoom="10.0">
+
+        <ru.dgis.sdk.map.SnapToMapLayout
+            android:id="@+id/snapToMapLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintTop_toTopOf="parent">
+
                 <ru.dgis.sdk.map.ZoomControl
                     android:id="@+id/zoomControl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:layout_height="wrap_content" />
+
                 <ru.dgis.sdk.map.MyLocationControl
                     android:id="@+id/locationControl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ru.dgis.sdk.map.MapView>
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-        <LinearLayout
-            android:id="@+id/settingsDrawerInnerLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:background="?android:attr/colorBackground"
-            app:behavior_hideable="false"
-            app:behavior_peekHeight="36dp"
-            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            >
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_pimp"
-                android:layout_marginBottom="12dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintLeft_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                >
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="24dp"
-                    android:background="?android:attr/colorBackground"
-                    />
-                <TextView
-                    style="@style/SubheadMediumLeftBlack"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:background="?android:attr/colorBackground"
-                    android:textAllCaps="true"
-                    android:gravity="center_vertical"
-                    android:text="Gestures Setup"
-                    android:textColor="?attr/colorOnBackground"
-                    />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/rotationSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:backgroundTint="?android:attr/colorBackground"
-                    android:text="Rotation"
-                    />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/shiftSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:paddingHorizontal="24dp"
-                    android:backgroundTint="?android:attr/colorBackground"
-                    android:text="Shift"
-                    />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/scaleSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:backgroundTint="?android:attr/colorBackground"
-                    android:text="Scale"
-                    />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/tiltSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:backgroundTint="?android:attr/colorBackground"
-                    android:text="Tilt"
-                    />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="24dp"
-                    />
-                <TextView
-                    style="@style/SubheadMediumLeftBlack"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="?android:attr/colorBackground"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:textAllCaps="true"
-                    android:gravity="center_vertical"
-                    android:text="Map Attributes"
-                    android:textColor="?attr/colorOnBackground"
-                    />
-
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </FrameLayout>

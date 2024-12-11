@@ -2,18 +2,27 @@ package ru.dgis.sdk.demo
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import ru.dgis.sdk.Context
-import ru.dgis.sdk.demo.common.updateMapCopyrightPosition
+import ru.dgis.sdk.geometry.GeoPointWithElevation
+import ru.dgis.sdk.map.Anchor
 import ru.dgis.sdk.map.BearingSource
-import ru.dgis.sdk.map.Gesture
-import ru.dgis.sdk.map.GestureManager
 import ru.dgis.sdk.map.Map
 import ru.dgis.sdk.map.MapView
 import ru.dgis.sdk.map.MyLocationControllerSettings
 import ru.dgis.sdk.map.MyLocationMapObjectSource
+import ru.dgis.sdk.map.SnapToMapLayout
+
+data class Point(
+    val id: Int,
+    val order: Int,
+    val lat: Double,
+    val lon: Double,
+    val isUrgent: Boolean
+)
 
 class GenericMapActivity : AppCompatActivity() {
     private val sdkContext: Context by lazy { application.sdkContext }
@@ -25,7 +34,6 @@ class GenericMapActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var root: View
-    private lateinit var settingsDrawerInnerLayout: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,20 +41,9 @@ class GenericMapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_map_generic)
 
         root = findViewById(R.id.content)
-        settingsDrawerInnerLayout = findViewById(R.id.settingsDrawerInnerLayout)
         mapView = findViewById<MapView>(R.id.mapView).also {
             it.getMapAsync(this::onMapReady)
             it.showApiVersionInCopyrightView = true
-        }
-
-        BottomSheetBehavior.from(findViewById(R.id.settingsDrawerInnerLayout)).apply {
-            state = BottomSheetBehavior.STATE_COLLAPSED
-            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {}
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    mapView.updateMapCopyrightPosition(root, settingsDrawerInnerLayout)
-                }
-            })
         }
     }
 
@@ -59,44 +56,30 @@ class GenericMapActivity : AppCompatActivity() {
         this.map = map
         closeables.add(map)
 
-        val gestureManager = checkNotNull(mapView.gestureManager)
-        subscribeGestureSwitches(gestureManager)
-
         mapSource = MyLocationMapObjectSource(
             sdkContext,
             MyLocationControllerSettings(BearingSource.MAGNETIC)
         )
         map.addSource(mapSource)
 
-        closeables.add(
-            map.camera.paddingChannel.connect { _ ->
-                mapView.updateMapCopyrightPosition(root, settingsDrawerInnerLayout)
-            }
-        )
-    }
+        // создание маркеров
+        val snapToMapLayout = findViewById<SnapToMapLayout>(R.id.snapToMapLayout)
 
-    private fun subscribeGestureSwitches(gm: GestureManager) {
-        val enabledGestures = gm.enabledGestures
-        val options = listOf(
-            Pair(R.id.rotationSwitch, Gesture.ROTATION),
-            Pair(R.id.shiftSwitch, Gesture.SHIFT),
-            Pair(R.id.scaleSwitch, Gesture.SCALING),
-            Pair(R.id.tiltSwitch, Gesture.TILT)
-        )
+        val json = assets.open("points.json").bufferedReader().use { it.readText() }
+        val gson = Gson()
+        val listType = object : TypeToken<List<Point>>() {}.type
+        val list = gson.fromJson<List<Point>>(json, listType)
 
-        options.forEach { (viewId, gesture) ->
-            findViewById<SwitchCompat>(viewId).apply {
-                isEnabled = true
-                isChecked = enabledGestures.contains(gesture)
+        list.forEach { point ->
+            val params = SnapToMapLayout.LayoutParams(
+                width = ViewGroup.LayoutParams.WRAP_CONTENT,
+                height = ViewGroup.LayoutParams.WRAP_CONTENT,
+                position = GeoPointWithElevation(point.lat, point.lon),
+                anchor = Anchor(0.5f, 1.0f),
+            )
 
-                setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        gm.enableGesture(gesture)
-                    } else {
-                        gm.disableGesture(gesture)
-                    }
-                }
-            }
+            val pointPin = PointPin(this, point)
+            snapToMapLayout.addView(pointPin.view, params)
         }
     }
 }
